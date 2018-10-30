@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -87,128 +87,22 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())  ===========[((x1,y1),'South',1),((x2,y2),'West',1)]
     """
     "*** YOUR CODE HERE ***"
-    from game import Directions
 
-    #initialization
-    fringe = util.Stack()
-    visitedList = []
-
-    #push the starting point into stack
-    fringe.push((problem.getStartState(),[],0))
-    #pop out the point
-    (state,toDirection,toCost) = fringe.pop()
-    #add the point to visited list
-    visitedList.append(state)
-
-    while not problem.isGoalState(state): #while we do not find the goal point
-        successors = problem.getSuccessors(state) #get the point's successors
-        for son in successors:
-            if (not son[0] in visitedList) or (problem.isGoalState(son[0])): # if the successor has not been visited,push it into stack
-                fringe.push((son[0],toDirection + [son[1]],toCost + son[2])) 
-                visitedList.append(son[0]) # add this point to visited list
-        (state,toDirection,toCost) = fringe.pop()
-
-    return toDirection
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    from game import Directions
-
-    #initialization
-    fringe = util.Queue()
-    visitedList = []
-
-    #push the starting point into queue
-    fringe.push((problem.getStartState(),[],0))
-    #pop out the point
-    (state,toDirection,toCost) = fringe.pop()
-    #add the point to visited list
-    visitedList.append(state)
-
-    while not problem.isGoalState(state): #while we do not find the goal point
-        successors = problem.getSuccessors(state) #get the point's successors
-        for son in successors:
-            if not son[0] in visitedList: # if the successor has not been visited,push it into queue
-                fringe.push((son[0],toDirection + [son[1]],toCost + son[2])) 
-                visitedList.append(son[0]) # add this point to visited list
-        (state,toDirection,toCost) = fringe.pop()
-
-    return toDirection
-
 
 
 def iterativeDeepeningSearch(problem):
     """This function is for the first of the grad students questions"""
-    "*** MY CODE HERE ***"
-    from game import Directions
-
-    #initialization
-    fringe = util.Stack()
-    limit = 1;
-
-    while True: # repeat search with the depth increases until we find the goal
-        visitedList = []
-        #push the starting point into stack
-        fringe.push((problem.getStartState(),[],0))
-        #pop out the point
-        (state,toDirection,toCost) = fringe.pop()
-        #add the point to visited list
-        visitedList.append(state)
-        while not problem.isGoalState(state): #while we do not find the goal point
-            successors = problem.getSuccessors(state) #get the point's succesors
-            for son in successors:
-                # add the points when it meets 1. not been visited 2. within the depth 
-                if (not son[0] in visitedList) and (toCost + son[2] <= limit): 
-                    fringe.push((son[0],toDirection + [son[1]],toCost + son[2])) 
-                    visitedList.append(son[0]) # add this point to visited list
-
-            if fringe.isEmpty(): # if the no goal is found within the current depth, jump out and increase the depth
-                break
-
-            (state,toDirection,toCost) = fringe.pop()
-
-        if problem.isGoalState(state):
-            return toDirection
-
-        limit += 1 # increase the depth
+    "*** YOUR CODE HERE ***"
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    from game import Directions
 
-    #initialization
-    fringe = util.PriorityQueue() 
-    visitedList = []
-
-    #push the starting point into queue
-    fringe.push((problem.getStartState(),[],0),0) # push starting point with priority num of 0
-    #pop out the point
-    (state,toDirection,toCost) = fringe.pop()
-    #add the point to visited list
-    visitedList.append((state,toCost))
-
-    while not problem.isGoalState(state): #while we do not find the goal point
-        successors = problem.getSuccessors(state) #get the point's succesors
-        for son in successors:
-            visitedExist = False
-            total_cost = toCost + son[2]
-            for (visitedState,visitedToCost) in visitedList:
-                # we add the point only if the successor has not been visited, or has been visited but now with a lower cost than the previous one
-                if (son[0] == visitedState) and (total_cost >= visitedToCost): 
-                    visitedExist = True # point recognized visited
-                    break
-
-            if not visitedExist:        
-                # push the point with priority num of its total cost
-                fringe.push((son[0],toDirection + [son[1]],toCost + son[2]),toCost + son[2]) 
-                visitedList.append((son[0],toCost + son[2])) # add this point to visited list
-
-        (state,toDirection,toCost) = fringe.pop()
-
-    return toDirection
 
 def nullHeuristic(state, problem=None):
     """
@@ -222,32 +116,32 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     from game import Directions
 
-    #initialization
-    fringe = util.PriorityQueue() 
+    # initializo la queue
+    fringe = util.PriorityQueue()
     visitedList = []
 
-    #push the starting point into queue
+    # le pusheo el starting point a la queue
     fringe.push((problem.getStartState(),[],0),0 + heuristic(problem.getStartState(),problem)) # push starting point with priority num of 0
-    #pop out the point
+    # le hago pop out al point
     (state,toDirection,toCost) = fringe.pop()
-    #add the point to visited list
+    # le agrego el point a la lista de visitados
     visitedList.append((state,toCost + heuristic(problem.getStartState(),problem)))
 
-    while not problem.isGoalState(state): #while we do not find the goal point
-        successors = problem.getSuccessors(state) #get the point's succesors
+    while not problem.isGoalState(state): # mientras no ecuentre goal point
+        successors = problem.getSuccessors(state) # tomo el point de los "succesors"
         for son in successors:
             visitedExist = False
             total_cost = toCost + son[2]
             for (visitedState,visitedToCost) in visitedList:
-                # if the successor has not been visited, or has a lower cost than the previous one
-                if (son[0] == visitedState) and (total_cost >= visitedToCost): 
+                # si los successor no fueron visitados, o tienen un bajo costo menor que el previo
+                if (son[0] == visitedState) and (total_cost >= visitedToCost):
                     visitedExist = True
                     break
 
-            if not visitedExist:        
-                # push the point with priority num of its total cost
-                fringe.push((son[0],toDirection + [son[1]],toCost + son[2]),toCost + son[2] + heuristic(son[0],problem)) 
-                visitedList.append((son[0],toCost + son[2])) # add this point to visited list
+            if not visitedExist:
+                # le pusheo el point con el numero de prioridad del costo total
+                fringe.push((son[0],toDirection + [son[1]],toCost + son[2]),toCost + son[2] + heuristic(son[0],problem))
+                visitedList.append((son[0],toCost + son[2])) # le agrego este point a la lista de visitados
 
         (state,toDirection,toCost) = fringe.pop()
 

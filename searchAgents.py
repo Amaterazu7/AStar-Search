@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -155,8 +155,8 @@ class PositionSearchProblem(search.SearchProblem):
         self.walls = gameState.getWalls()
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
-        self.goal = goal 
-        self.costFn = costFn 
+        self.goal = goal
+        self.costFn = costFn
         self.visualize = visualize
         if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
             print 'Warning: this does not look like a regular search maze'
@@ -289,9 +289,9 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         self.costFn = lambda x,y: 1
-        # initialized corner visited state
-        self.cornerVisited=[False,False,False,False] 
-        # define a state as (position,corner visited list)
+        # inicializo el corner state
+        self.cornerVisited=[False,False,False,False]
+        # defino mi state como (posicion, lista de corners visitados)
         self.startState=(self.startingPosition,self.cornerVisited)
 
     def getStartState(self):
@@ -334,29 +334,28 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            # current state
+            # statado actual
             x,y = state[0]
             cornerVisited = state[1]
-            # direction
+            # direccion
             dx,dy = Actions.directionToVector(action)
-            # new position
+            # nueva posicion
             x_new,y_new = int(x + dx),int(y + dy)
-            # copy the 'center' point's corner visited list,note this is a deep copy since cornerVisited is a variable
             cornerVisited_new = cornerVisited[:]
             isWall = self.walls[x_new][y_new]
             if not isWall:
-                cornerIndex = 0 # index of each corresponding corner in the corner list
-                # check if on of the corners is visited
+                cornerIndex = 0 # index de cada corner correspondiente en la lista de corners
+                # checkeo si uno de los corners fue visitado
                 for corner in self.corners:
                     if (x_new,y_new) == corner:
                         break
                     cornerIndex += 1
 
-                if cornerIndex < 4: # is in one corner
-                    cornerVisited_new[cornerIndex] = True # update the corner visited list
+                if cornerIndex < 4:
+                    cornerVisited_new[cornerIndex] = True # actualizo el corner visitado
                 state_new = ((x_new,y_new),cornerVisited_new)
                 cost = self.costFn(x_new,y_new)
-                successors.append((state_new,action,cost)) # add this successor
+                successors.append((state_new,action,cost)) # le agrego esto a successor
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -395,26 +394,26 @@ def cornersHeuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
     # Considering the goal is just a state with four corners visited, this Heuristic function simply calculate the total
-    # manhattan distance from the current position to the final state. First calculate the distance between the current 
+    # manhattan distance from the current position to the final state. First calculate the distance between the current
     # position and the closest corner. Then calculate the distance between the first closest corner and the new closest
     # corner until it reaches the state with four corners all visited.
     H = 0
-    position = state[0][:] # deep copy of current position
-    visitedlist = state[1][:] # deep copy of current visited list
-    for i in range(4): # there remains at most 4 corners unvisited, so we need to go for four timrs
+    position = state[0][:] # copio mi posicion actual
+    visitedlist = state[1][:] # copio mi actual lista de visitados
+    for i in range(4): # tenemos que recorrer cuatro veces los corners que vamos visitar
         cornersDistance = [0,0,0,0]
         cornerIndex = 0
-        # calculate the distance between the current position and each of the corners
+        # calculamos la distancia entre la actual posicicion y cada uno de los corners
         for corner in visitedlist:
             cornersDistance[cornerIndex] = util.manhattanDistance(position,corners[cornerIndex])
             cornerIndex += 1
 
         closestIndex = 0
-        cornerIndex = 0 # reset to 0
+        cornerIndex = 0 # reseteamos a 0
         for cornerDiatance in cornersDistance:
-            if (visitedlist[closestIndex]): # in case the first corner is visited
+            if (visitedlist[closestIndex]): # en caso de que el primer corner es visitado
                 closestIndex = cornerIndex
-            # check each corner: 1. not been visited 2. distance is less the current closest one => set to be the new closest one
+            # checkeo cada corner: 1. no fue visitado 2. la distancia es menos que la actual mas cerca => la seteo para ser la nueva mas cerca
             if (not visitedlist[cornerIndex]) and (cornerDiatance < cornersDistance[closestIndex]):
                 closestIndex = cornerIndex
             cornerIndex += 1
@@ -523,18 +522,18 @@ def foodHeuristic(state, problem):
     # For this heuristic function, the goal state is eating out all the food. We search through Astar method. To make it admissible,
     # we need to guarantee the cost <= actual cost. The function mazeDistance() just returns a distance from one position to the other using
     # the search method we use in the problem. So we could use this function to get the minimum distance from the current position to any
-    # of the food point. Since we have to go to the farthest food point in order to eat out all of the food, if we use the farthest distance 
+    # of the food point. Since we have to go to the farthest food point in order to eat out all of the food, if we use the farthest distance
     # to be the Heuristc, it will be the minimum actual cost when all the other food points is on the way to the farthest food point. For other
-    # situations, the actual cost would just be more than this one since we need to move away from this way to get another food point. So the 
-    # heuristic function is admissible as well as consistent. 
+    # situations, the actual cost would just be more than this one since we need to move away from this way to get another food point. So the
+    # heuristic function is admissible as well as consistent.
     H = 0
     maxDistance = 0
-    # find the farthest distance by Astar search using mazeDistance() function.
+    # Busco la distancia mas lejos con Astar search usando la funcion "mazeDistance()"
     for y in range(foodGrid.height):
         for x in range(foodGrid.width):
             if (foodGrid[x][y] == 1) and (mazeDistance(position,(x,y),problem.startingGameState) > maxDistance):
                 maxDistance = mazeDistance(position,(x,y),problem.startingGameState)
-    H = maxDistance     
+    H = maxDistance
     return H
 
 
